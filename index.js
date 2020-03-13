@@ -84,11 +84,23 @@ schedule.scheduleJob('0 0 10 * * *', () => {
     });
 })
 
+schedule.scheduleJob('0 * * * * *', () => {
+    getNews().then(news => {
+        news.forEach(n => {
+            subscribers.forEach(chatId => bot.telegram.sendMessage(chatId, n));
+        })
+    }).catch(err => {
+        console.error("ERROR:", err);
+        ctx.reply("Something went wrong!");
+    });
+})
+
 const bot = new Telegraf(process.env.TELEGRAM_API)
 
 bot.start((ctx) => {
     subscribers.push(ctx.chat.id)
     ctx.reply("Subscribed to Korona news!");
+    ctx.reply("Type '/stats' to get the newest statistics.");
 })
 
 bot.command('stats', (ctx) => {
