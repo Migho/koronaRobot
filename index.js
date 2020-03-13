@@ -4,10 +4,10 @@ console.log("key:", process.env.TELEGRAM_API);
 const Telegraf = require('telegraf')
 const axios = require('axios');
 const getNews = require('./news');
-const casesPerCountry = require('./country');
+const casesPerCountry = require('./countries');
 
 const url = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnishCoronaData";
-const subscribers = []
+const subscribers = [];
 
 const parseResponse = (resp) => {
     const confirmed = JSON.stringify(resp.data.confirmed.slice(0,5));
@@ -45,11 +45,13 @@ bot.command('stats', (ctx) => {
     });
 })
 
-bot.command('getnews', (ctx) => {
-    const news = getNews().then(news => {
-        console.log(news);
-        ctx.reply(news);
-    })
+bot.command('news', (ctx) => {
+    getNews().then(news => {
+        news.forEach(n => ctx.reply(n));
+    }).catch(err => {
+        console.error("ERROR:", err);
+        ctx.reply("Something went wrong!");
+    });
 })
 
 bot.launch()
