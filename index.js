@@ -4,6 +4,7 @@ console.log("key:", process.env.TELEGRAM_API);
 const Telegraf = require('telegraf')
 const axios = require('axios');
 const getNews = require('./news');
+const casesPerCountry = require('./country');
 
 const url = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnishCoronaData";
 const subscribers = []
@@ -17,19 +18,6 @@ const parseResponse = (resp) => {
     FIVE LATEST CONFIRMED CASES:\n\n${confirmed}\n\n
     DEATHS:\n\n${deaths}\n\n
     RECOVERED:\n\n${recovered}`;
-};
-
-const casesPerCountry = (confirmed) => {
-    const countries = {};
-    confirmed.forEach(a => {
-        const country = a.infectionSourceCountry ? a.infectionSourceCountry : "UNKNOWN";
-        if (countries[country]) {
-            countries[country] += 1;
-        } else {
-            countries[country] = 1;
-        }
-    });
-    return JSON.stringify(countries);
 };
 
 // Crons
