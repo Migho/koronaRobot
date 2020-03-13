@@ -2,6 +2,8 @@ require('dotenv').config()
 const _ = require('lodash');
 const schedule = require('node-schedule');
 const Telegraf = require('telegraf')
+const extra = require('telegraf/extra')
+const markup = extra.markdown()
 const axios = require('axios');
 const getNews = require('./news');
 const casesPerCountry = require('./countries');
@@ -46,20 +48,22 @@ const getRandomRelief = () => {
 }
 
 const parseChange = value => {
-    return value > 0 ? `+${value} 24h` : value < 0 ? `-${Math.abs(value)} 24h` : value
+    return (value > 0 ? `+*${value}*` : value < 0 ? `-*${Math.abs(value)}*` : `*${value}*`) + " _viimeisen 24h aikana_";
 }
 
 const parseSimpleStats = resp => {
     const total = resp.data.confirmed.length - resp.data.deaths.length - resp.data.recovered.length
     let totalChange = getLastDay(resp.data.confirmed).length - getLastDay(resp.data.recovered).length - getLastDay(resp.data.deaths).length
 
-    return `Sairaita: ${resp.data.confirmed.length - resp.data.deaths.length - resp.data.recovered.length} (${parseChange(totalChange)})\n` +
-    `Infektotuneita: ${resp.data.confirmed.length} (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
-    `Parantuneita: ${resp.data.recovered.length} (${parseChange(getLastDay(resp.data.recovered).length)})\n` +
-    `Kuolleita: ${resp.data.deaths.length} (${parseChange(getLastDay(resp.data.deaths).length)})\n` +
-    `${totalChange >= 0 ? getRandomEncourage() : getRandomRelief()}`
+    return `Sairaita: *${resp.data.confirmed.length - resp.data.deaths.length - resp.data.recovered.length}* (${parseChange(totalChange)})\n` +
+    `Infektotuneita: *${resp.data.confirmed.length}* (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
+    `Parantuneita: *${resp.data.recovered.length}* (${parseChange(getLastDay(resp.data.recovered).length)})\n` +
+    `Kuolleita: *${resp.data.deaths.length}* (${parseChange(getLastDay(resp.data.deaths).length)})\n` +
+    `Viiruksen lähdemaa:\n${casesPerCountry(resp.data.confirmed)}\n` +
+    `_${totalChange >= 0 ? getRandomEncourage() : getRandomRelief()}_`
 }
 
+// OLD
 const parseResponse = (resp) => {
     const confirmed = JSON.stringify(resp.data.confirmed.slice(0,5));
     const deaths = JSON.stringify(resp.data.deaths);
@@ -89,7 +93,7 @@ bot.start((ctx) => {
 
 bot.command('stats', (ctx) => {
     axios.get(url).then(resp => {
-        ctx.reply(parseSimpleStats(resp));
+        bot.telegram.sendMessage(ctx.message.chat.id, parseSimpleStats(resp), markup);
     }).catch(err => {
         console.error("ERROR:", err);
         ctx.reply("Something went wrong!");
