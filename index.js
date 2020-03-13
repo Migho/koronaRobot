@@ -96,8 +96,6 @@ const bot = new Telegraf(process.env.TELEGRAM_API)
 bot.start((ctx) => {
     subscribers.push(ctx.chat.id)
     ctx.reply("Subscribed to Korona news!");
-    ctx.reply("Type '/stats' to get the newest statistics.");
-    ctx.reply("Type '/news' to get the current news.");
 })
 
 bot.command('unsubscribe', (ctx) => {
