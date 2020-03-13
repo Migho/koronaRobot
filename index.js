@@ -21,6 +21,14 @@ const getLastDay = data => {
     return results
 }
 
+const getRandomExcuse = () => {
+    return _.sample([
+        'En kerro!',
+        'Korona vaivaa, en voi vastata',
+        'Älä kysele.'
+    ]);
+}
+
 const getRandomEncourage = () => {
     return _.sample([
         'Luoja meitä varjelkoon!',
@@ -33,7 +41,8 @@ const getRandomEncourage = () => {
         'Tänään kannattaa pysyä kotona!',
         'Muista pestä käsiä!',
         '😶',
-        'Varo vaaraa!'
+        'Varo vaaraa!',
+        'Hae Korona kaupasta, se auttaa!'
     ]);
 }
 
@@ -63,18 +72,6 @@ const parseSimpleStats = resp => {
     `_${totalChange >= 0 ? getRandomEncourage() : getRandomRelief()}_`
 }
 
-// OLD
-const parseResponse = (resp) => {
-    const confirmed = JSON.stringify(resp.data.confirmed.slice(0,5));
-    const deaths = JSON.stringify(resp.data.deaths);
-    const recovered = JSON.stringify(resp.data.recovered);
-    return `NUMBER OF CONFIRMED CASES:\n\n${resp.data.confirmed.length}\n\n
-    CASES PER COUNTRY:\n\n${casesPerCountry(resp.data.confirmed)}\n\n
-    FIVE LATEST CONFIRMED CASES:\n\n${confirmed}\n\n
-    DEATHS:\n\n${deaths}\n\n
-    RECOVERED:\n\n${recovered}`;
-};
-
 // Crons
 schedule.scheduleJob('0 0 10 * * *', () => {
     axios.get(url).then(resp => {
@@ -91,7 +88,6 @@ schedule.scheduleJob('0 * * * * *', () => {
         })
     }).catch(err => {
         console.error("ERROR:", err);
-        ctx.reply("Something went wrong!");
     });
 })
 
@@ -104,12 +100,18 @@ bot.start((ctx) => {
     ctx.reply("Type '/news' to get the current news.");
 })
 
+bot.command('unsubscribe', (ctx) => {
+    var index = subscribers.indexOf(ctx.chat.id)
+    if (index !== -1) subscribers.splice(index, 1);
+    ctx.reply('Unsubscribed :(');
+})
+
 bot.command('stats', (ctx) => {
     axios.get(url).then(resp => {
         bot.telegram.sendMessage(ctx.message.chat.id, parseSimpleStats(resp), markup);
     }).catch(err => {
         console.error("ERROR:", err);
-        ctx.reply("Something went wrong!");
+        ctx.reply(getRandomExcuse());
     });
 })
 
@@ -118,7 +120,7 @@ bot.command('news', (ctx) => {
         news.forEach(n => ctx.reply(n));
     }).catch(err => {
         console.error("ERROR:", err);
-        ctx.reply("Something went wrong!");
+        ctx.reply(getRandomExcuse());
     });
 })
 
