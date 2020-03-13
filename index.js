@@ -85,7 +85,7 @@ schedule.scheduleJob('0 0 10 * * *', () => {
 })
 
 schedule.scheduleJob('0 * * * * *', () => {
-    getNews().then(news => {
+    getNews(true).then(news => {
         news.forEach(n => {
             subscribers.forEach(chatId => bot.telegram.sendMessage(chatId, n));
         })
@@ -101,6 +101,7 @@ bot.start((ctx) => {
     subscribers.push(ctx.chat.id)
     ctx.reply("Subscribed to Korona news!");
     ctx.reply("Type '/stats' to get the newest statistics.");
+    ctx.reply("Type '/news' to get the current news.");
 })
 
 bot.command('stats', (ctx) => {
@@ -113,7 +114,7 @@ bot.command('stats', (ctx) => {
 })
 
 bot.command('news', (ctx) => {
-    getNews().then(news => {
+    getNews(false).then(news => {
         news.forEach(n => ctx.reply(n));
     }).catch(err => {
         console.error("ERROR:", err);
