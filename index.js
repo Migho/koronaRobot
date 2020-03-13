@@ -3,6 +3,7 @@ const schedule = require('node-schedule');
 console.log("key:", process.env.TELEGRAM_API);
 const Telegraf = require('telegraf')
 const axios = require('axios');
+const getNews = require('./news');
 
 const url = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnishCoronaData";
 const subscribers = []
@@ -54,6 +55,13 @@ bot.command('stats', (ctx) => {
         console.error("ERROR:", err);
         ctx.reply("Something went wrong!");
     });
+})
+
+bot.command('getnews', (ctx) => {
+    const news = getNews().then(news => {
+        console.log(news);
+        ctx.reply(news);
+    })
 })
 
 bot.launch()
