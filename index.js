@@ -92,7 +92,7 @@ schedule.scheduleJob('0 0 10 * * *', () => {
 })
 
 schedule.scheduleJob('0 * * * * *', () => {
-    getNews(true).then(news => {
+    getNews(false).then(news => {
         news.forEach(n => {
             subscribers.forEach(chatId => bot.telegram.sendMessage(chatId, n));
         })
@@ -125,7 +125,7 @@ bot.command('stats', (ctx) => {
 })
 
 bot.command('news', (ctx) => {
-    getNews(false).then(news => {
+    getNews(true).then(news => {
         news.forEach(n => ctx.reply(n));
     }).catch(err => {
         console.error("ERROR:", err);
