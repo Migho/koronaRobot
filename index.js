@@ -9,7 +9,7 @@ const { parseSimpleStats, parseAdvancedStats } = require('./stats');
 const getRandomExcuse = require('./random');
 
 const url = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnishCoronaData";
-const subscribers = [];
+const subscribers = new Set();
 
 // Crons
 schedule.scheduleJob('0 0 8 * * *', () => {
@@ -34,13 +34,12 @@ schedule.scheduleJob('0 * * * * *', () => {
 const bot = new Telegraf(process.env.TELEGRAM_API)
 
 bot.start((ctx) => {
-    subscribers.push(ctx.chat.id)
+    subscribers.add(ctx.chat.id)
     ctx.reply("Subscribed to Korona news!");
 })
 
 bot.command('unsubscribe', (ctx) => {
-    var index = subscribers.indexOf(ctx.chat.id)
-    if (index !== -1) subscribers.splice(index, 1);
+    subscribers.delete(ctx.chat.id)
     ctx.reply('Unsubscribed :(');
 })
 
