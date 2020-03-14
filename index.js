@@ -12,9 +12,9 @@ const url = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnish
 const subscribers = [];
 
 // Crons
-schedule.scheduleJob('0 0 10 * * *', () => {
+schedule.scheduleJob('0 0 8 * * *', () => {
     axios.get(url).then(resp => {
-        subscribers.forEach(chatId => bot.telegram.sendMessage(chatId, parseSimpleStats(resp)))
+        subscribers.forEach(chatId => bot.telegram.sendMessage(chatId, parseSimpleStats(resp), markup))
     }).catch(err => {
         console.error("ERROR:", err);
     });
