@@ -19,7 +19,7 @@ const parseSimpleStats = resp => {
     const totalChange = getLastDay(resp.data.confirmed).length - getLastDay(resp.data.recovered).length - getLastDay(resp.data.deaths).length;
 
     return `Sairaita: *${resp.data.confirmed.length - resp.data.deaths.length - resp.data.recovered.length}* (${parseChange(totalChange)})\n` +
-    `Infektotuneita: *${resp.data.confirmed.length}* (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
+    `Tartuntoja: *${resp.data.confirmed.length}* (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
     `Parantuneita: *${resp.data.recovered.length}* (${parseChange(getLastDay(resp.data.recovered).length)})\n` +
     `Kuolleita: *${resp.data.deaths.length}* (${parseChange(getLastDay(resp.data.deaths).length)})\n` +
     `_${totalChange >= 0 ? getRandomEncourage() : getRandomRelief()}_`;
@@ -29,7 +29,7 @@ const parseAdvancedStats = resp => {
     const totalChange = getLastDay(resp.data.confirmed).length - getLastDay(resp.data.recovered).length - getLastDay(resp.data.deaths).length;
 
     return `Sairaita: *${resp.data.confirmed.length - resp.data.deaths.length - resp.data.recovered.length}* (${parseChange(totalChange)})\n` +
-    `Infektotuneita: *${resp.data.confirmed.length}* (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
+    `Tartuntoja: *${resp.data.confirmed.length}* (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
     `Parantuneita: *${resp.data.recovered.length}* (${parseChange(getLastDay(resp.data.recovered).length)})\n` +
     `Kuolleita: *${resp.data.deaths.length}* (${parseChange(getLastDay(resp.data.deaths).length)})\n` +
     `Viiruksen lähdemaa:\n${casesPerCountry(resp.data.confirmed)}\n`;
