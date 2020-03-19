@@ -9,12 +9,13 @@ const { parseSimpleStats, parseAdvancedStats } = require('./stats');
 const getRandomExcuse = require('./random');
 
 const url = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnishCoronaData";
-const subscribers = new Set();
+const newsSubscribers = new Set();
+const statsSubscribers = new Set();
 
 // Crons
 schedule.scheduleJob('0 0 8 * * *', () => {
     axios.get(url).then(resp => {
-        subscribers.forEach(chatId => bot.telegram.sendMessage(chatId, parseSimpleStats(resp), markup))
+        statsSubscribers.forEach(chatId => bot.telegram.sendMessage(chatId, parseSimpleStats(resp), markup))
     }).catch(err => {
         console.error("ERROR:", err);
     });
@@ -23,7 +24,7 @@ schedule.scheduleJob('0 0 8 * * *', () => {
 schedule.scheduleJob('0 * * * * *', () => {
     getNews(false).then(news => {
         news.forEach(n => {
-            subscribers.forEach(chatId => bot.telegram.sendMessage(chatId, n));
+            newsSubscribers.forEach(chatId => bot.telegram.sendMessage(chatId, n));
         })
     }).catch(err => {
         console.error("ERROR:", err);
@@ -34,13 +35,23 @@ schedule.scheduleJob('0 * * * * *', () => {
 const bot = new Telegraf(process.env.TELEGRAM_API)
 
 bot.start((ctx) => {
-    subscribers.add(ctx.chat.id)
-    ctx.reply("Subscribed to Korona news!");
+    ctx.reply("Commands: /stats | /news | /subscribenews | /subscribestats | /unsubscribe");
+})
+
+bot.command('subscribenews', (ctx) => {
+    newsSubscribers.add(ctx.chat.id)
+    ctx.reply("Subscribed to HS Korona news!");
+})
+
+bot.command('subscribestats', (ctx) => {
+    statsSubscribers.add(ctx.chat.id)
+    ctx.reply("Subscribed to daily stats!");
 })
 
 bot.command('unsubscribe', (ctx) => {
-    subscribers.delete(ctx.chat.id)
-    ctx.reply('Unsubscribed :(');
+    newsSubscribers.delete(ctx.chat.id)
+    statsSubscribers.delete(ctx.chat.id)
+    ctx.reply('Unsubscribed from all lists :(');
 })
 
 bot.command('stats', (ctx) => {
