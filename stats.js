@@ -11,28 +11,38 @@ const getLastDay = data => {
     return results;
 }
 
+
+
 const parseChange = value => {
-    return (value > 0 ? `+*${value}*` : value < 0 ? `-*${Math.abs(value)}*` : `*${value}*`) + " _viimeisen 24h aikana_";
+    return (value > 0 ? `+*${value}*` : value < 0 ? `-*${Math.abs(value)}*` : `*${value}*`) + " _viim. 24h aikana_";
 }
 
-const parseSimpleStats = resp => {
-    const totalChange = getLastDay(resp.data.confirmed).length - getLastDay(resp.data.recovered).length - getLastDay(resp.data.deaths).length;
+const parseSimpleStats = data => {
+    const totalChange = getLastDay(data.cases.confirmed).length - getLastDay(data.cases.recovered).length - getLastDay(data.cases.deaths).length;
+    const hospitalizedAll = data.hospitalised.filter(e => e.area === 'Finland');
 
-    return `Sairaita: *${resp.data.confirmed.length - resp.data.deaths.length - resp.data.recovered.length}* (${parseChange(totalChange)})\n` +
-    `Tartuntoja: *${resp.data.confirmed.length}* (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
-    `Parantuneita: *${resp.data.recovered.length}* (${parseChange(getLastDay(resp.data.recovered).length)})\n` +
-    `Kuolleita: *${resp.data.deaths.length}* (${parseChange(getLastDay(resp.data.deaths).length)})\n` +
-    `_${totalChange >= 0 ? getRandomEncourage() : getRandomRelief()}_`;
+    return `Tartuntoja: *${data.cases.confirmed.length}* (${parseChange(getLastDay(data.cases.confirmed).length)})\n` +
+    `Parantuneita: *${data.cases.recovered.length}* (${parseChange(getLastDay(data.cases.recovered).length)})\n` +
+    `Kuolleita: *${data.cases.deaths.length}* (${parseChange(getLastDay(data.cases.deaths).length)})\n` +
+    ` - - - \n` +
+    `Sairaita: *${data.cases.confirmed.length - data.cases.deaths.length - data.cases.recovered.length}* (${parseChange(totalChange)})\n` +
+    `Sairaalahoidossa: *${hospitalizedAll[0].totalHospitalised}* (${parseChange(hospitalizedAll[0].totalHospitalised - hospitalizedAll[1].totalHospitalised)})\n` +
+    `Joista teholla: *${hospitalizedAll[0].inIcu}* (${parseChange(hospitalizedAll[0].inIcu - hospitalizedAll[1].inIcu)})\n` +
+    ` - - - \n` +
+    `_${getLastDay(data.cases.confirmed).length - getLastDay(data.cases.recovered).length >= 0 ? getRandomEncourage() : getRandomRelief()}_`;
 }
 
-const parseAdvancedStats = resp => {
-    const totalChange = getLastDay(resp.data.confirmed).length - getLastDay(resp.data.recovered).length - getLastDay(resp.data.deaths).length;
+const parseAdvancedStats = data => {
+    const totalChange = getLastDay(data.cases.confirmed).length - getLastDay(data.cases.recovered).length - getLastDay(data.cases.deaths).length;
+    const hospitalizedAll = data.hospitalised.filter(e => e.area === 'Finland');
 
-    return `Sairaita: *${resp.data.confirmed.length - resp.data.deaths.length - resp.data.recovered.length}* (${parseChange(totalChange)})\n` +
-    `Tartuntoja: *${resp.data.confirmed.length}* (${parseChange(getLastDay(resp.data.confirmed).length)})\n` +
-    `Parantuneita: *${resp.data.recovered.length}* (${parseChange(getLastDay(resp.data.recovered).length)})\n` +
-    `Kuolleita: *${resp.data.deaths.length}* (${parseChange(getLastDay(resp.data.deaths).length)})\n` +
-    `Viiruksen lähdemaa:\n${casesPerCountry(resp.data.confirmed)}\n`;
+    return `Tartuntoja: *${data.cases.confirmed.length}* (${parseChange(getLastDay(data.cases.confirmed).length)})\n` +
+    `Parantuneita: *${data.cases.recovered.length}* (${parseChange(getLastDay(data.cases.recovered).length)})\n` +
+    `Kuolleita: *${data.cases.deaths.length}* (${parseChange(getLastDay(data.cases.deaths).length)})\n` +
+    ` - - - \n` +
+    `Sairaita: *${data.cases.confirmed.length - data.cases.deaths.length - data.cases.recovered.length}* (${parseChange(totalChange)})\n` +
+    `Sairaalahoidossa: *${hospitalizedAll[0].totalHospitalised}* (${parseChange(hospitalizedAll[0].totalHospitalised - hospitalizedAll[1].totalHospitalised)})\n` +
+    `Joista teholla: *${hospitalizedAll[0].inIcu}* (${parseChange(hospitalizedAll[0].inIcu - hospitalizedAll[1].inIcu)})\n`
 }
 
 module.exports = { parseSimpleStats, parseAdvancedStats };
