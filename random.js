@@ -29,7 +29,7 @@ const getRandomRelief = () => {
 
 const getRandomExcuse = () => {
     return _.sample([
-        'En kerro!',
+        'Enn!',
         'Korona vaivaa, en voi vastata',
         'Älä kysele.'
     ]);

@@ -4,14 +4,19 @@ const Telegraf = require('telegraf')
 const extra = require('telegraf/extra')
 const markup = extra.markdown()
 const axios = require('axios');
+const fs = require('fs');
+
 const getNews = require('./news');
 const { parseSimpleStats, parseAdvancedStats } = require('./stats');
 const { getRandomExcuse } = require('./random');
 
 const URL_CASES = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnishCoronaData/v2";
 const URL_HOSPITALISED = "https://w3qa5ydb4l.execute-api.eu-west-1.amazonaws.com/prod/finnishCoronaHospitalData";
-const newsSubscribers = new Set();
-const statsSubscribers = new Set();
+const STATS_SUBSCRIBERS_FILE = "statsSubscribers.txt"
+const NEWS_SUBSCRIBERS_FILE = "newsSubscribers.txt"
+
+let newsSubscribers = new Set();
+let statsSubscribers = new Set();
 
 // Axios calls
 const getData = async () => {
@@ -43,6 +48,13 @@ schedule.scheduleJob('0 * * * * *', () => {
     });
 })
 
+// "Database" commands. todo create separate file for these.
+const saveSet = (fileName, set) => {
+    fs.writeFile(fileName, JSON.stringify([...set]), (err) => {
+        if (err) throw err;
+    });
+}
+
 // Bot stuff
 const bot = new Telegraf(process.env.TELEGRAM_API)
 
@@ -51,19 +63,38 @@ bot.start((ctx) => {
 })
 
 bot.command('subscribenews', (ctx) => {
-    newsSubscribers.add(ctx.chat.id)
-    ctx.reply("Subscribed to HS Korona news!");
+    try {
+        newsSubscribers.add(ctx.chat.id)
+        saveSet(NEWS_SUBSCRIBERS_FILE, newsSubscribers)
+        ctx.reply("Subscribed to HS Korona news!");
+    } catch(err) {
+        console.error("ERROR:", err);
+        ctx.reply(getRandomExcuse());
+    };
 })
 
 bot.command('subscribestats', (ctx) => {
-    statsSubscribers.add(ctx.chat.id)
-    ctx.reply("Subscribed to daily stats!");
+    try {
+        statsSubscribers.add(ctx.chat.id)
+        saveSet(STATS_SUBSCRIBERS_FILE, statsSubscribers)
+        ctx.reply("Subscribed to daily stats!");
+    } catch(err) {
+        console.error("ERROR:", err);
+        ctx.reply(getRandomExcuse());
+    };
 })
 
 bot.command('unsubscribe', (ctx) => {
-    newsSubscribers.delete(ctx.chat.id)
-    statsSubscribers.delete(ctx.chat.id)
-    ctx.reply('Unsubscribed from all lists :(');
+    try {
+        newsSubscribers.delete(ctx.chat.id)
+        statsSubscribers.delete(ctx.chat.id)
+        saveSet(NEWS_SUBSCRIBERS_FILE, newsSubscribers)
+        saveSet(STATS_SUBSCRIBERS_FILE, statsSubscribers)
+        ctx.reply('Unsubscribed from all lists :(');
+    } catch(err) {
+        console.error("ERROR:", err);
+        ctx.reply(getRandomExcuse());
+    };
 })
 
 bot.command('stats', async (ctx) => {
@@ -83,5 +114,24 @@ bot.command('news', (ctx) => {
         ctx.reply(getRandomExcuse());
     });
 })
+
+// Load data, start the bot
+fs.readFile(STATS_SUBSCRIBERS_FILE, function (err, data) {
+    if (err) {
+        console.warn("WARN: The stats subscribers file might be missing or broken.")
+    } else {
+        statsSubscribers = new Set(JSON.parse(data))
+        console.log(`Successfully loaded ${statsSubscribers.size} stats subscribers`)
+    }
+});
+
+fs.readFile(NEWS_SUBSCRIBERS_FILE, function (err, data) {
+    if (err) {
+        console.warn("WARN: The news subscribers file might be missing or broken.")
+    } else {
+        statsSubscribers = new Set(JSON.parse(data))
+        console.log(`Successfully loaded ${statsSubscribers.size} news subscribers`)
+    }
+});
 
 bot.launch()
