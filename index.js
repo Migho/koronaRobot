@@ -29,7 +29,7 @@ const getData = async () => {
 }
 
 // Crons
-schedule.scheduleJob('0 0 6 * * *', async () => {
+schedule.scheduleJob('0 0 9 * * *', async () => {
     try {
         const data = await getData()
         statsSubscribers.forEach(chatId => bot.telegram.sendMessage(chatId, parseSimpleStats(data), markup))
