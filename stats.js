@@ -22,10 +22,8 @@ const parseSimpleStats = data => {
     const hospitalizedAll = data.hospitalised.filter(e => e.area === 'Finland');
 
     return `Tartuntoja: *${data.cases.confirmed.length}* (${parseChange(getLastDay(data.cases.confirmed).length)})\n` +
-    `Parantuneita: *${data.cases.recovered.length}* (${parseChange(getLastDay(data.cases.recovered).length)})\n` +
     `Kuolleita: *${data.cases.deaths.length}* (${parseChange(getLastDay(data.cases.deaths).length)})\n` +
     ` - - - \n` +
-    `Sairaita: *${data.cases.confirmed.length - data.cases.deaths.length - data.cases.recovered.length}* (${parseChange(totalChange)})\n` +
     `Sairaalahoidossa: *${hospitalizedAll[0].totalHospitalised}* (${parseChange(hospitalizedAll[0].totalHospitalised - hospitalizedAll[1].totalHospitalised)})\n` +
     `Joista teholla: *${hospitalizedAll[0].inIcu}* (${parseChange(hospitalizedAll[0].inIcu - hospitalizedAll[1].inIcu)})\n` +
     ` - - - \n` +
@@ -37,10 +35,8 @@ const parseAdvancedStats = data => {
     const hospitalizedAll = data.hospitalised.filter(e => e.area === 'Finland');
 
     return `Tartuntoja: *${data.cases.confirmed.length}* (${parseChange(getLastDay(data.cases.confirmed).length)})\n` +
-    `Parantuneita: *${data.cases.recovered.length}* (${parseChange(getLastDay(data.cases.recovered).length)})\n` +
     `Kuolleita: *${data.cases.deaths.length}* (${parseChange(getLastDay(data.cases.deaths).length)})\n` +
     ` - - - \n` +
-    `Sairaita: *${data.cases.confirmed.length - data.cases.deaths.length - data.cases.recovered.length}* (${parseChange(totalChange)})\n` +
     `Sairaalahoidossa: *${hospitalizedAll[0].totalHospitalised}* (${parseChange(hospitalizedAll[0].totalHospitalised - hospitalizedAll[1].totalHospitalised)})\n` +
     `Joista teholla: *${hospitalizedAll[0].inIcu}* (${parseChange(hospitalizedAll[0].inIcu - hospitalizedAll[1].inIcu)})\n`
 }
