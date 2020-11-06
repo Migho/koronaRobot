@@ -45,7 +45,7 @@ const parseSimpleStats = data => {
 const parseAdvancedStats = data => {
     const hospitalizedAll = data.hospitalised.filter(e => e.area === 'Finland');
 
-    return `Tartuntoja: *${data.cases.confirmed.length}* (${parseChange(getLastDay(data.cases.confirmed).length)})\n` +
+    return `Tartuntoja: *${data.cases.confirmed.length}* (${parseWeekChange(getLastWeek(data.cases.confirmed).length)})\n` +
     `Kuolleita: *${data.cases.deaths.length}* (${parseChange(getLastDay(data.cases.deaths).length)})\n` +
     ` - - - \n` +
     `Sairaalahoidossa: *${hospitalizedAll[0].totalHospitalised}* (${parseChange(hospitalizedAll[0].totalHospitalised - hospitalizedAll[1].totalHospitalised)})\n` +
