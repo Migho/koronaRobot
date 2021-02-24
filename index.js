@@ -90,7 +90,7 @@ bot.command('unsubscribe', (ctx) => {
         statsSubscribers.delete(ctx.chat.id)
         saveSet(NEWS_SUBSCRIBERS_FILE, newsSubscribers)
         saveSet(STATS_SUBSCRIBERS_FILE, statsSubscribers)
-        ctx.reply('Unsubscribed from all lists :(');
+        ctx.reply('Unsubscribed from all lists');
     } catch(err) {
         console.error("ERROR:", err);
         ctx.reply(getRandomExcuse());
